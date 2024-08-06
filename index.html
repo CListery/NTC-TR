@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NTC计算器</title>
+
+  <script src="jquery.js"></script>
+  <script src="jquery.flot.js"></script>
+  <script src="alex_cal_draw.js"></script>
+
+  <style type=text/css>
+    body {
+      LINE-HEIGHT: 11pt
+    }
+
+    a {
+      TEXT-DECORATION: none
+    }
+
+    a:hover {
+      TEXT-DECORATION: underline
+    }
+
+    .boxpopup {
+      BORDER-BOTTOM: gray 1px solid;
+      TEXT-ALIGN: left;
+      BORDER-LEFT: gray 1px solid;
+      PADDING-BOTTOM: 4px;
+      PADDING-LEFT: 5px;
+      WIDTH: 250px;
+      PADDING-RIGHT: 5px;
+      BACKGROUND: #ffff99;
+      COLOR: black;
+      FONT-SIZE: 13px;
+      BORDER-TOP: gray 1px solid;
+      FONT-WEIGHT: normal;
+      BORDER-RIGHT: gray 1px solid;
+      PADDING-TOP: 4px
+    }
+
+    #pdqbox {
+      Z-INDEX: 100;
+      POSITION: absolute;
+      VISIBILITY: hidden
+    }
+  </style>
+
+  <script>
+    var R1; var R2; var R3; var T1; var T2; var T3; var A; var B; var C;
+    var Beta; var R25; var Rth; var Fail; var Rmin; var Rmax; var datasets;
+  </script>
+
+  <meta name=GENERATOR content="Microsoft FrontPage 4.0">
+</head>
+
+<body>
+  <div id=pdqbox></div>
+  <script>
+    var OffsetX = -30
+    var OffsetY = 20
+    var old,
+      skn,
+      iex = document.all,
+      yyy = -1000
+    var ns4 = document.layers
+    var ns6 = document.getElementById && !document.all
+    var ie4 = document.all
+    if (ns4) skn = document.pdqbox
+    else if (ns6) skn = document.getElementById('pdqbox').style
+    else if (ie4) skn = document.all.pdqbox.style
+    if (ns4) document.captureEvents(Event.MOUSEMOVE)
+    else {
+      skn.visibility = 'visible'
+      skn.display = 'none'
+    }
+    document.onmousemove = get_mouse
+    function popup(msg) {
+      var content = '<div class=boxpopup>' + msg + '</div>'
+      yyy = OffsetY
+      if (ns4) {
+        skn.document.write(content)
+        skn.document.close()
+        skn.visibility = 'visible'
+      }
+      if (ns6) {
+        document.getElementById('pdqbox').innerHTML = content
+        skn.display = ''
+      }
+      if (ie4) {
+        document.all('pdqbox').innerHTML = content
+        skn.display = ''
+      }
+    }
+    function get_mouse(e) {
+      var x = ns4 || ns6 ? e.pageX : event.x + document.body.scrollLeft
+      skn.left = x + OffsetX
+      var y = ns4 || ns6 ? e.pageY : event.y + document.body.scrollTop
+      skn.top = y + yyy
+    }
+    function remove_popup() {
+      yyy = -1000
+      if (ns4) {
+        skn.visibility = 'hidden'
+      } else if (ns6 || ie4) skn.display = 'none'
+    }
+  </script>
+
+  <table
+    style="BORDER-BOTTOM-COLOR: rgb(240,240,240); BACKGROUND-COLOR: rgb(210,255,255); BORDER-TOP-COLOR: rgb(240,240,240); BORDER-RIGHT-COLOR: rgb(240,240,240); BORDER-LEFT-COLOR: rgb(240,240,240)"
+    border="1" cellSpacing=0 cellPadding=10 width=710>
+    <TBODY>
+      <TR>
+        <TD>
+          <FORM name=form1>&nbsp;<span
+              style="font-family: Arial; color: rgb(10,10,10); font-size: 22px; font-weight: normal">热敏电阻计算器</span>
+            <BR><SPAN
+              style="FONT-FAMILY: inherit; COLOR: rgb(120,120,0); FONT-SIZE: 14px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<BR></SPAN>
+            <BR><span style="font-family: Arial; color: rgb(0,0,0); font-size: 12px; font-weight: bold">请输入阻值和温度</span>
+            <BR><SPAN
+              style="FONT-FAMILY: Arial; COLOR: rgb(120,120,0); FONT-SIZE: 12px; FONT-WEIGHT: normal">&nbsp;(不要使用回车键)</SPAN>
+            <SPAN style="FONT-FAMILY: Times New Roman; FONT-SIZE: 15px; FONT-WEIGHT: normal">
+              <DIV style="MARGIN-LEFT: 40px">
+                R(Ω)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;T(℃)
+              </DIV>
+              &nbsp; R1:<INPUT onchange=Cal() name=R1 value=10000 size=8> &nbsp; T1: <INPUT onchange=Cal() name=T1
+                value=25 size=6>
+              <BR>
+              &nbsp; R2:<INPUT onchange=Cal() name=R2 value=4160 size=8> &nbsp; T2: <INPUT onchange=Cal() name=T2
+                value=50 size=6>
+              &nbsp;&nbsp;&nbsp;&nbsp;
+              <A onmouseover="popup('三组数据, (R1,T1), (R2,T2) 和 (R3,T3), 需在不同的温度条件下测得. 数据选择点最好的结果是选择要测试的温度范围的两个端点和中间点,比如要测试温度为25~85度，那么三点选择25，55，85度三点')"
+                onmouseout=remove_popup() ; alt="" herf="/">
+                <svg
+                  style="BORDER-BOTTOM: 0px solid; BORDER-LEFT: 0px solid; WIDTH: 16px; HEIGHT: 16px; BORDER-TOP: 0px solid; BORDER-RIGHT: 0px solid"
+                  t="1722933967656" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                  xmlns="http://www.w3.org/2000/svg" p-id="2293" width="17" height="17">
+                  <path
+                    d="M510.983345 63.599504c246.331291 0 447.87554 201.544249 447.87554 447.87554 0 246.332315-201.544249 447.87554-447.87554 447.87554S63.108828 757.806335 63.108828 511.474021C63.108828 265.143753 264.652054 63.599504 510.983345 63.599504L510.983345 63.599504zM575.273581 639.544885l-127.913275 0 0 127.913275 127.913275 0L575.273581 639.544885zM575.273581 255.42132l-127.913275 0 0 320.67858 127.913275 0L575.273581 255.42132z"
+                    p-id="2294" fill="#e98f36"></path>
+                </svg>
+              </A>
+              <BR>&nbsp; R3:<INPUT onchange=Cal() name=R3 value=1451 size=8> &nbsp; T3: <INPUT onchange=Cal() name=T3
+                value=85 size=6>
+              <BR>
+              <BR>
+              <span
+                style="font-family: Times New Roman; color: rgb(0,0,0); font-size: 15px; font-weight: normal">计算</span><span
+                style="FONT-FAMILY: Arial; COLOR: rgb(0,0,0); FONT-SIZE: 13px; FONT-WEIGHT: bold">
+                Steinhart-Hart </span><span
+                style="font-family: Times New Roman; color: rgb(0,0,0); font-size: 15px; font-weight: normal">模式温度系数</span><span
+                style="FONT-FAMILY: Arial; COLOR: rgb(0,0,0); FONT-SIZE: 13px; FONT-WEIGHT: bold">:</span><BR><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              A = <INPUT onchange=setA() name=A size=10><SPAN style="FONT-FAMILY: Arial; FONT-SIZE: 15px">
+                e-3</SPAN><BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              B = <INPUT onchange=setB() name=B size=10><SPAN style="FONT-FAMILY: Arial; FONT-SIZE: 15px"> e-4</SPAN>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A
+                onmouseover="popup('热敏电阻 Steinhart-Hart 温度系数通过上面3个温度点可以计算出A,B,C的值，如果你在这里直接输入温度系数A,B,C的值，那么温度曲线会根据你输入A,B,C的值直接显示新的曲线而忽略上述三点的数值')"
+                onmouseout=remove_popup() ; alt="" herf="/"><svg
+                  style="BORDER-BOTTOM: 0px solid; BORDER-LEFT: 0px solid; WIDTH: 16px; HEIGHT: 16px; BORDER-TOP: 0px solid; BORDER-RIGHT: 0px solid"
+                  t="1722933967656" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                  xmlns="http://www.w3.org/2000/svg" p-id="2293" width="17" height="17">
+                  <path
+                    d="M510.983345 63.599504c246.331291 0 447.87554 201.544249 447.87554 447.87554 0 246.332315-201.544249 447.87554-447.87554 447.87554S63.108828 757.806335 63.108828 511.474021C63.108828 265.143753 264.652054 63.599504 510.983345 63.599504L510.983345 63.599504zM575.273581 639.544885l-127.913275 0 0 127.913275 127.913275 0L575.273581 639.544885zM575.273581 255.42132l-127.913275 0 0 320.67858 127.913275 0L575.273581 255.42132z"
+                    p-id="2294" fill="#e98f36"></path>
+                </svg>
+              </A>
+              <BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              C = <INPUT onchange=setC() name=C size=10><SPAN style="FONT-FAMILY: Arial; FONT-SIZE: 15px"> e-7</SPAN>
+              &nbsp;<A
+                onmouseover="popup('&nbsp;&nbsp;1/T = A + B&#8226;ln(R) + C&#8226;[ln(R)]<sup>3</sup><br>这里: T 为绝对温度K.<br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp;R 单位是欧姆')"
+                onmouseout=remove_popup() ; alt="" herf="/"><SPAN
+                  style="FONT-FAMILY: Arial Narrow; COLOR: rgb(255,128,64); FONT-SIZE: 10px">
+                  <span lang="EN-US" style="font-size:10.0pt">S-H model</span><span style="font-size:10.0pt;font-family:宋体;mso-ascii-font-family:&quot;Times New Roman&quot;;                   
+  mso-hansi-font-family:&quot;Times New Roman&quot;">计算方法</span><span lang="EN-US" style="font-size:10.0pt">
+                    <o:p>
+                    </o:p>
+                  </span></SPAN></A>
+            </span><SPAN style="FONT-FAMILY: Times New Roman; FONT-SIZE: 15px; FONT-WEIGHT: normal"><BR><BR></span>
+            <SPAN style="font-family: Times New Roman; font-size: 15px; font-weight: normal; color: rgb(0,0,0)">
+              计算B值温度系数</span><SPAN style="FONT-FAMILY: Times New Roman; FONT-SIZE: 15px; FONT-WEIGHT: normal"><SPAN
+                style="FONT-FAMILY: Arial; COLOR: rgb(0,0,0); FONT-SIZE: 13px; FONT-WEIGHT: bold">:</SPAN><BR><SPAN
+                style="FONT-FAMILY: Arial; COLOR: rgb(120,120,0); FONT-SIZE: 12px; FONT-WEIGHT: normal">&nbsp;(</SPAN></span><SPAN
+              style="font-family: Times New Roman; color: rgb(120,120,0); font-size: 15px; font-weight: normal">不使用R3和T3</SPAN><SPAN
+              style="FONT-FAMILY: Times New Roman; FONT-SIZE: 15px; FONT-WEIGHT: normal"><SPAN
+                style="FONT-FAMILY: Arial; COLOR: rgb(120,120,0); FONT-SIZE: 12px; FONT-WEIGHT: normal">)</SPAN><BR><BR>&nbsp;R(25℃)
+              = <INPUT onchange=setR25() name=R25 size=9><SPAN style="FONT-FAMILY: Arial">
+              </SPAN>Ω<SPAN style="FONT-FAMILY: Arial"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<A
+                  onmouseover="popup('B值是根据上面(R1,T1)和(T2,R2)计算获得，如果在此输入B值，曲线将直接依据B值绘出R-T曲线而忽略(R,T)')"
+                  onmouseout=remove_popup() ; alt="" herf="/">
+                  <svg
+                    style="BORDER-BOTTOM: 0px solid; BORDER-LEFT: 0px solid; WIDTH: 16px; HEIGHT: 16px; BORDER-TOP: 0px solid; BORDER-RIGHT: 0px solid"
+                    t="1722933967656" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                    xmlns="http://www.w3.org/2000/svg" p-id="2293" width="17" height="17">
+                    <path
+                      d="M510.983345 63.599504c246.331291 0 447.87554 201.544249 447.87554 447.87554 0 246.332315-201.544249 447.87554-447.87554 447.87554S63.108828 757.806335 63.108828 511.474021C63.108828 265.143753 264.652054 63.599504 510.983345 63.599504L510.983345 63.599504zM575.273581 639.544885l-127.913275 0 0 127.913275 127.913275 0L575.273581 639.544885zM575.273581 255.42132l-127.913275 0 0 320.67858 127.913275 0L575.273581 255.42132z"
+                      p-id="2294" fill="#e98f36"></path>
+                  </svg>
+                </A>
+                <BR>&nbsp;</SPAN></span><SPAN
+              style="font-family: Times New Roman; font-size: 15px; font-weight: normal">温度系数</SPAN><SPAN
+              style="FONT-FAMILY: Times New Roman; FONT-SIZE: 15px; FONT-WEIGHT: normal">&nbsp;</span><SPAN
+              style="font-family: Times New Roman; font-size: 15px; font-weight: normal">B<span lang="EN-US"
+                style="font-size:6.5pt">T1/T2<o:p>
+                </o:p>
+              </span>
+              = <INPUT onchange=setBeta() name=Beta size=9><SPAN style="FONT-FAMILY: Arial"> K</SPAN>&nbsp;</SPAN><A
+              onmouseover="popup(';R = R(25℃)&#8226;exp[B&#8226;(1/T - 1/298.15)] <br>这里: T 为绝对温度K.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;R(25℃) 是热敏电阻在 25℃时的阻值 (单位为Ω).')"
+              onmouseout=remove_popup() ; alt="" herf="/"><SPAN
+                style="font-family: Times New Roman; color: rgb(255,128,64); font-size: 15px; font-weight: normal">B
+              </SPAN></A><SPAN style="FONT-FAMILY: Times New Roman; FONT-SIZE: 15px; FONT-WEIGHT: normal"><A
+                onmouseover="popup(';R = R(25℃)&#8226;exp[B&#8226;(1/T - 1/298.15)] <br>这里: T 为绝对温度K.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;R(25℃) 是热敏电阻在 25℃时的阻值 (单位为Ω).')"
+                onmouseout=remove_popup() ; alt="" herf="/"><SPAN
+                  style="FONT-FAMILY: Arial Narrow; COLOR: rgb(255,128,64); FONT-SIZE: 10px"><span lang="EN-US"
+                    style="font-size:10.0pt">
+                    model</span><span style="font-size:10.0pt;font-family:宋体;mso-ascii-font-family:&quot;Times New Roman&quot;;       
+  mso-hansi-font-family:&quot;Times New Roman&quot;">计算方法</span><span lang="EN-US" style="font-size:10.0pt">
+                    <o:p>
+                    </o:p>
+                  </span></SPAN></A></span><SPAN
+              style="font-family: Times New Roman; font-size: 15px; font-weight: normal"><BR></SPAN>
+          </FORM>
+        </TD>
+        <TD>
+          <FORM name=form2>
+            <DIV style="WIDTH: 350px; HEIGHT: 300px" id=placeholder></DIV>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<SPAN
+              style="FONT-FAMILY: inherit; COLOR: rgb(120,120,0); FONT-SIZE: 13px" id=choices></SPAN> <SPAN
+              style="FONT-FAMILY: Arial; COLOR: rgb(120,120,0); FONT-SIZE: 12px; FONT-WEIGHT: normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;温度(</SPAN><SPAN
+              style="FONT-FAMILY: Times New Roman; FONT-SIZE: 15px; FONT-WEIGHT: normal">℃</span><SPAN
+              style="FONT-FAMILY: Arial; COLOR: rgb(120,120,0); FONT-SIZE: 12px; FONT-WEIGHT: normal">)</SPAN>
+            <script>
+              var dsets = // prepare initial data for check box and initial drawing 
+              {
+                "Beta": { label: "B", data: [25, 10000] },
+                "Steinhart": { label: "S-H", data: [20, 10000] },
+                "Orignal": { label: "Data", data: [25, 10000] }
+              }
+              var choiceContainer = $("#choices");
+              $.each(dsets, function (key, val) {
+                choiceContainer.append('<input type="checkbox" name="' + key +
+                  '" checked="checked" id="id' + key + '">' +
+                  '<label for="id' + key + '">'
+                  + val.label + '</label>');
+              })	     
+            </script>
+            <BR><BR><SPAN
+              style="FONT-FAMILY: Arial; COLOR: rgb(10,10,10); FONT-SIZE: 22px; FONT-WEIGHT: normal">&nbsp;&nbsp;&nbsp;温度曲线方式</SPAN><BR><SPAN
+              style="FONT-FAMILY: Arial; COLOR: rgb(120,120,0); FONT-SIZE: 12px; FONT-WEIGHT: normal">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(温度系数见左侧)</SPAN><BR>
+            <TABLE border=0>
+              <TBODY>
+                <TR style="FONT-FAMILY: Arial; FONT-SIZE: 15px; FONT-WEIGHT: normal">
+                  <TH align=right> <SPAN style="FONT-FAMILY: Times New Roman; FONT-SIZE: 15px; FONT-WEIGHT: normal">
+                      R(Ω) </span>&nbsp;&nbsp;&nbsp;&nbsp;</TH>
+                  <TH></TH>
+                  <TH align=left>&nbsp;&nbsp;&nbsp;<SPAN
+                      style="FONT-FAMILY: Times New Roman; FONT-SIZE: 15px; FONT-WEIGHT: normal">T(℃)</span></TH>
+                </TR>
+                <TR style="FONT-FAMILY: Arial; FONT-SIZE: 14px; FONT-WEIGHT: normal">
+                  <TH align=right>&nbsp;&nbsp;<A
+                      onmouseover="popup('改变电阻值，相应的温度曲线Steinhart-Hart模式，和B值模式的温度会跟着改变，上下控制键可以改变阻值.')"
+                      onmouseout=remove_popup() ; alt="" herf="/">
+                      <svg
+                        style="BORDER-BOTTOM: 0px solid; BORDER-LEFT: 0px solid; WIDTH: 16px; HEIGHT: 16px; BORDER-TOP: 0px solid; BORDER-RIGHT: 0px solid"
+                        t="1722933967656" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                        xmlns="http://www.w3.org/2000/svg" p-id="2293" width="17" height="17">
+                        <path
+                          d="M510.983345 63.599504c246.331291 0 447.87554 201.544249 447.87554 447.87554 0 246.332315-201.544249 447.87554-447.87554 447.87554S63.108828 757.806335 63.108828 511.474021C63.108828 265.143753 264.652054 63.599504 510.983345 63.599504L510.983345 63.599504zM575.273581 639.544885l-127.913275 0 0 127.913275 127.913275 0L575.273581 639.544885zM575.273581 255.42132l-127.913275 0 0 320.67858 127.913275 0L575.273581 255.42132z"
+                          p-id="2294" fill="#e98f36"></path>
+                      </svg>
+                    </A> &nbsp;
+                    &nbsp;&nbsp;<INPUT
+                      onkeydown="if(event.keyCode==38) increaseR(); else if(event.keyCode==40) decreaseR(); "
+                      onkeyup=Model_Calculator(); name=Rth value=10000 size=8></TH>
+                  <TH>
+                    <font size="4">&#8596;</font>
+                  <TH align=left><INPUT onchange=TsteinhartToRth() name=Tsteinhart size=7 ;><SPAN
+                      style="FONT-FAMILY: Arial"> S-H </SPAN>模式</TH>
+                </TR>
+                <TR style="FONT-FAMILY: Arial; FONT-SIZE: 14px; FONT-WEIGHT: normal">
+                  <TH style="FONT-FAMILY: Arial; COLOR: rgb(120,120,0); FONT-SIZE: 12px; FONT-WEIGHT: normal"
+                    align=right>使用<font size="3"> ↑ ↓</font>改变阻值&nbsp;&nbsp;&nbsp;</TH>
+                  <TH></TH>
+                  <TH align=left><INPUT onchange=TbetaToRth() name=Tbeta size=7 ;><SPAN style="FONT-FAMILY: Arial"> B
+                    </SPAN>值模式</TH>
+                </TR>
+              </TBODY>
+            </TABLE>
+            <script>
+              window.open = Cal();	     
+            </script>
+          </FORM>
+        </TD>
+      </TR>
+    </TBODY>
+  </TABLE>
+</body>
+
+</html>
